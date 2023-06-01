@@ -6,8 +6,6 @@ import {
   orderBy,
   onSnapshot,
   where,
-  QuerySnapshot,
-  doc,
 } from "firebase/firestore";
 
 export const useFetchDocuments = (docCollection, search = null, uid = null) => {
@@ -23,29 +21,37 @@ export const useFetchDocuments = (docCollection, search = null, uid = null) => {
       if (cancelled) {
         return;
       }
+
       setLoading(true);
 
       const collectionRef = await collection(db, docCollection);
 
       try {
         let q;
-        q = await query(collectionRef, orderBy("createdAt", "desc"));
 
-        await onSnapshot(q, (QuerySnapshot) => {
+        if (search) {
+          q = await query(
+            collectionRef,
+            where("tagArray", "array-contains", search),
+            orderBy("createdAt", "desc")
+          );
+        } else {
+          q = await query(collectionRef, orderBy("createdAt", "desc"));
+        }
+
+        await onSnapshot(q, (querySnapshot) => {
           setDocuments(
-            QuerySnapshot.docs.map((doc) => ({
+            querySnapshot.docs.map((doc) => ({
               id: doc.id,
               ...doc.data(),
             }))
           );
         });
-
-        setLoading(false);
       } catch (error) {
         console.log(error);
         setError(error.message);
-        setLoading(false);
       }
+      setLoading(false);
     }
     loadData();
   }, [docCollection, search, uid, cancelled]);
