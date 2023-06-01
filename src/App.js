@@ -14,6 +14,8 @@ import Home from "./pages/Home/Home";
 import About from "./pages/About/About";
 import Register from "./pages/Register/Register";
 import Login from "./pages/Login/Login";
+import Dashboard from "./pages/Dashboard/Dashboard";
+import CreatePost from "./pages/CreatePost/CreatePost";
 
 function App() {
   const [user, setUser] = useState(undefined);
@@ -33,7 +35,7 @@ function App() {
 
   return (
     <div className="App">
-      <AuthContextProvider value={{user}}>
+      <AuthContextProvider value={{ user }}>
         <BrowserRouter>
           <Navbar />
           <div className="container">
@@ -47,6 +49,14 @@ function App() {
               <Route
                 path="/login"
                 element={!user ? <Login /> : <Navigate to="/" />}
+              />
+              <Route
+                path="/posts/create"
+                element={user ? <CreatePost /> : <Navigate to="/login" />}
+              />
+              <Route
+                path="/dashboard"
+                element={user ? <Dashboard /> : <Navigate to="/login" />}
               />
             </Routes>
           </div>
